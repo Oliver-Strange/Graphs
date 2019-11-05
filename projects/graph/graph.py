@@ -3,56 +3,164 @@ Simple graph implementation
 """
 from util import Stack, Queue  # These may come in handy
 
+
 class Graph:
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
+
     def __init__(self):
         self.vertices = {}
+
     def add_vertex(self, vertex):
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        self.vertices[vertex] = set()
+
+    def get_neighbors(self, vertex_id):
+        return self.vertices[vertex_id]
+
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
+        else:
+            raise IndexError('can not make edge')
+
+    def add_undirected_edge(self, v1, v2):
+        """
+        Add a undirected edge to the graph.
+        """
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
+            self.vertices[v2].add(v1)
+        else:
+            raise IndexError('can not make edge')
+
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
+        cyclic graphs needs visited list
+        acyclic graphs 
         """
-        pass  # TODO
+        q = Queue()
+
+        visit = set()
+
+        q.enqueue(starting_vertex)
+
+        while q.size() > 0:
+            vertex = q.dequeue()
+
+            if vertex not in visit:
+                visit.add(vertex)
+                print(vertex)
+
+                for nextVertex in self.vertices[vertex]:
+                    q.enqueue(nextVertex)
+
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
-    def dft_recursive(self, starting_vertex):
+        s = Stack()
+        s.push(starting_vertex)
+
+        visit = set()
+
+        while s.size() > 0:
+            vertex = s.pop()
+
+            if vertex not in visit:
+                print(vertex)
+                visit.add(vertex)
+
+    def dft_recursive(self, starting_vertex, visited=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         This should be done using recursion.
         """
-        pass  # TODO
+        # mark as visited
+        # call dft on neighbors
+        if visited is None:
+            visited = set()
+
+        if starting_vertex not in visited:
+            print(starting_vertex)
+            visited.add(starting_vertex)
+
+            for neighbor in self.vertices[starting_vertex]:
+                self.dft_recursive(neighbor, visited)
+
     def bfs(self, starting_vertex, destination_vertex):
         """
         Return a list containing the shortest path from
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue([starting_vertex])
+
+        visited = set()
+
+        while q.size() > 0:
+
+            path = q.dequeue()
+
+            v = path[-1]
+
+            if v not in visited:
+
+                if v == destination_vertex:
+                    return path
+
+                visited.add(v)
+
+                for neighbor in self.get_neighbors(v):
+
+                    path_copy = path.copy()
+
+                    path_copy.append(neighbor)
+                    q.enqueue(path_copy)
+
+        return None
+
     def dfs(self, starting_vertex, destination_vertex):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        s = Stack()
+        s.push([starting_vertex])
 
+        visited = set()
 
+        while s.size() > 0:
 
+            path = s.pop()
+
+            v = path[-1]
+
+            if v not in visited:
+
+                if v == destination_vertex:
+                    return path
+
+                visited.add(v)
+
+                for neighbor in self.get_neighbors(v):
+
+                    path_copy = path.copy()
+
+                    path_copy.append(neighbor)
+                    s.push(path_copy)
+
+        return None
 
 
 if __name__ == '__main__':
